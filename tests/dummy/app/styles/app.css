@@ -526,3 +526,7 @@ hr {
   -webkit-transition-timing-function: linear;
   transition-timing-function: linear;
 }
+
+.exiting {
+  border: 3px solid rgba(0,0,0,0.2);
+}

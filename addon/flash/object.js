@@ -32,14 +32,8 @@ export default EmberObject.extend(Evented, {
   },
 
   destroyMessage() {
-    const queue = get(this, 'queue');
-
-    if (queue) {
-      queue.removeObject(this);
-    }
-
-    this.destroy();
-    this.trigger('didDestroyMessage');
+    let extendedTimeout = get(this, 'extendedTimeout') || 0;
+    return extendedTimeout ? this._delayedTeardown(extendedTimeout) : this._teardown();
   },
 
   exitMessage() {
@@ -117,5 +111,22 @@ export default EmberObject.extend(Evented, {
     timers.forEach((timer) => {
       this._cancelTimer(timer);
     });
-  }
+  },
+
+  _delayedTeardown(extendedTimeout) {
+    set(this, 'exiting', true);
+    later(() => {
+      this._teardown();
+    }, extendedTimeout);
+  },
+
+  _teardown() {
+    const queue = get(this, 'queue');
+    if (queue) {
+      queue.removeObject(this);
+    }
+
+    this.destroy();
+    this.trigger('didDestroyMessage');
+  },
 });

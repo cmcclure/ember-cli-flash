@@ -136,4 +136,25 @@ if (parseFloat(Ember.VERSION) > 2.0) {
     this.$(":contains(close)").click();
     assert.ok(destroyMessage.calledOnce, 'flash is destroyed after clicking close');
   });
+
+  test('exiting class is applied for sticky messages', function(assert) {
+    assert.expect(1);
+    const _delayedTeardown = sinon.spy();
+    this.set('flash', FlashMessage.create({
+      message: 'flash message content',
+      sticky: true,
+      extendedTimeout: 100,
+      _delayedTeardown
+    }));
+
+    this.render(hbs`
+      {{#flash-message flash=flash as |component flash|}}
+        <span>{{flash.message}}</span>
+      {{/flash-message}}
+    `);
+
+    const flashDiv = this.$('.alert:eq(0)');
+    flashDiv.click();
+    assert.ok(_delayedTeardown.calledOnce, 'exiting is delayed');
+  });
 }
